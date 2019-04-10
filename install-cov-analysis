@@ -1,0 +1,4 @@
+#!/bin/sh
+location="/opt/Coverity/CoverityStaticAnalysis"
+mkdir -p $location
+./cov-analysis-linux64-7.6.0.sh -q -dir "$location" -Vlicense.dat=./license.dat
