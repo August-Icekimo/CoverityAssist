@@ -1,3 +1,22 @@
 #!/bin/sh
-./cov-platform-linux64-7.6.0.sh -q -dir"/opt/Coverity/Coverity_Platform" -Vadmin.password=1qaz@WSX -Vlicense.agreement=i.agree.to.the.license -Vlicense.dat=./license.dat -Vdb.type=embedded -Vhostname=cov7 -Vhttp.port=8080 -Vaccept.https=true -Vhttps.port=8443 -Vcommit.port=9090 -Vcontrol.port=8005 -Vdb.embedded.port=5432 -Vinternal.db.embedded.settings=Medium -Vs13n.enable=true -db.dir="/opt/Coverity/Coverity_Platform/database"
+#### Arguments
+hostname=$(hostname)
+pwd=$(pwd)
+location="/opt/Coverity_Platform"
+apackage=$(ls cov-platform*.sh | sort | tail -n1)
+chmod +x $apackage
+#### If localtion is unwriteable
+
+ ./$apackage -q -dir"$location" \
+-Vadmin.password=1qaz@WSX \
+-Vlicense.agreement=i.agree.to.the.license \
+-Vlicense.dat=$pwd/license.dat \
+-Vdb.type=embedded \
+-Vhostname=$hostname \
+-Vhttp.port=8080 \
+-Vaccept.https=true -Vhttps.port=8443 \
+-Vcommit.port=9090 -Vcontrol.port=8005 -Vdb.embedded.port=5432 \
+-Vinternal.db.embedded.settings=Medium \
+-Vs13n.enable=true \
+-db.dir="$location/database"
 
