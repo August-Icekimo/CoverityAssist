@@ -1,4 +1,104 @@
 #!/bin/sh
-location="/opt/Coverity/CoverityStaticAnalysis"
-mkdir -p $location
-./cov-analysis-linux64-7.6.0.sh -q -dir "$location" -Vlicense.dat=./license.dat
+[ $# -eq 0 ] && echo Use -d for Drone or -q for Hive install type.
+        # You should get real license for production use.
+pwd=$(pwd)
+if [ -f license.dat ]; then 
+    ls -l license.dat
+else
+    echo "Temporary License created."
+    touch license.dat
+fi
+	# Exam install folder ready or not
+location="/opt/CoverityAnalysis"
+if [ -d $location ]; then 
+    echo "Install Folder exists." 
+    ls $location
+else
+    mkdir -p $location 2>/dev/null || { print_error; exit; }
+fi 
+
+        # Search install file name which is the latest
+apackage=$(ls cov-ana*.sh | sort | tail -n1)
+        # Ready to Run install QUIETLY.
+chmod +x $apackage
+
+eval ./$apackage -q -dir "$location" -VlicenseChoice=0 -Vlicense.dat=$pwd/license.dat -Vlicense.region=2 -Vfor.desktop=false -Vinstallation.location.file=$location -Vcomponent.sa-da=true
+
+ [ $# -eq 0 ] && rm $location/bin/cov-*-recede
+
+while [ $# -gt 0 ]
+ do 
+ case "$1" in 
+  -d) 
+    eval mv $location/bin/cov-analyze $location/bin/cov-analyze-recede
+    eval mv $location/bin/cov-commit-defects $location/bin/cov-commit-defects-recede
+    drone="1"
+    ;; 
+  -q)
+    eval mv $location/bin/cov-build $location/bin/cov-build-recede
+    eval $location/bin/cov-generate-hostid
+    hive="1"
+    ;; 
+  *) 
+    ;; 
+ esac 
+shift 
+done
+
+########## Put Custom shellscript for Drone-Hive Arch
+
+if [ ! -z $drone ]; then
+echo Drone Buzzed.  
+cat <<'COVANALYZE' | base64 -d | bzcat > $location/bin/cov-analyze
+QlpoOTFBWSZTWcm7wdUAAJH/gHSQAER/N/Yfb+ff+j////pAAoqhzIANBEaQTNGo0wRiNAaaZMja
+mTRpiZGE0NBoKaGmmjVP0UepoAAAAAAAA9QAcNNMEMhppkZMIBpoAwmjTJgAQNBKCETaQaGin6TI
+TammQ9TanqGgAABoNHqOAkkYLJWw/DN9PZWfgIs31T19sWU6J5q7ewK/PnIYBOmoCBNqMNMkF/1q
+SusmIBRNgMjF8sIyghUysVjVYg8Xq1iJ6IMEDVqSnrsQkPcPlfVzYc+ngniHitVVoIcSpC/Ev7A2
+gWYjGwlpOlWUzTPgrKjFJiJ0Ny5VWg55Hs914TaPZrYhd0xkByp1Cz5znpenqa1xGOY7l+6pF0lb
+N8EZKEAQwbqhsCsuKGR1CUCOGLPSVon6Pwm4ioDkr8oeC3g0VRJrzN2LHexWi3rjHHSSzLY1aNRq
+Qom1MitMSksGG2AgASwJbyxxjBorNGoYcw0McbvlBpG1/W49QUPMkBdltuXXmkMY7Yc0QRq5vivs
+jsSHUgF2mF7paCyMjdS6rv05t6kbr7+47e32rrQOZEhIpNfKwVRl+Jokf4Mi8ZGfiJHSbVa+qilg
+7/K2lqcckAYScnCIotnqsBmCoJagYMya63ku9Lr1k/mJdh7LAp4rBhCLIv3rUJZHWB4x3fkBWU71
+mM+lBeiWDMWRYJaqcBsIWIluaq6PNoB04CIcCEIXNRXh3KykJxSEYi8rktGa1Hthwo6WQS3MGv7a
+c4V0azGUTDAgRGysXI/C7WGO5dDSwWXBhToqhx6RPdKN8g2dGRL50TGdkGYCSsrjSYHd3dFDEakT
+Lk5CdxcmamdrZsfEsgN1mVbwqoooXq3XdAcxooZ1GFRVBVUyomV2XY0iqCVV3pQJrh1VgqjQtgTn
+S1NHO/WUEQkURLWUmQU3u1VFMkUscSCLeMG1hIKkNlfg38gPgXw9hgMVtWGsio96PFyNkkOJpVUO
+ff/xdyRThQkMm7wdUA==
+COVANALYZE
+chmod +x  $location/bin/cov-analyze
+
+cat <<'COVCOMMIT' | base64 -d | bzcat > $location/bin/cov-commit-defects
+QlpoOTFBWSZTWblxgxsAANLfgFGwfHf+n3//3+q//9+wUAPe7a7u47buZUu3W8JQggU9I9ACZpPS
+mZE9QBtI8pkyA9RmoyBoTQExNU8mlPanqmg0Bppo0GjIAAPUNHqDRqaJT9U9qj9U2SMg0AAAaZDQ
+aABoAOMmTRiGmhgJoYmjTJiBkYTRpphBkwlEBTU8TIniRpoDQAAADQNAACAkiKkQCYqBUv+io9cL
+rHEe3Uxl0d2wknAxzyRMYlFzubKLZPxPD8vdOJLjAnIVkAxHFN1l4QCuqICp4v4uZko35+z0wnEF
+SdCtVV3I5USqf+VSoJqvPcfePDAkrjYrVd9Jb2SU5zMP0iZBfKmJTNHfwrK6t43KXrXhzXvoY1qk
+ebbTjqSCcK5uCp0fA0Yc2T3z4Euf3e7xWTJZl4mrN7MW0yi7ftWrIR5LmrOTHqKKFEEa25TcYHFB
+79bZRtJPGJVtGcamDfYz32rcupkel0oMHEQBuJzlDAIqEEItAqhgPhoKrRUMRQTtRJDLdQzqZZDb
+tvSrjqgkBQFO9jyvC0s5bBgYkGmcBhpxv91bVWzgyr27Oyrus06sV1puhnLPYxlfW4cHdJCEZH2W
+uORVuFEdCHWXQjrUVspKmFyQ8xSJFQiahmMEerqNfgbiG7Zt55iE0yesi3Tt2gPsPyPx+y2y+GyD
+cQyjsA6P89G4fNtKFRi0QpdJjsXwIZMaSktEYUhBIQYTCutFDywfEWBPiZBwFZIwvKiZqO9x0/lm
+XoEszm18RPJz3vhsHSRRcUNJDlF9jIR3vGBRNGGHREGb1kA4xYZdNdAsLIE+S00gdtMH0Ave5pkt
+aGwnC6OXKiHjytZTm0bHYnG0uMTlMFo+1gz6YRhaUHMjSSCZu3f4zjje9JlC6bVMgZgzBkoeGEHP
+VkFYOdUPrXHOFDEL3LxmNL9yOm9B6oSomVtz66ZkC2KKmJUVYDkMzVJ9G7QtSpLPNiMa8BNWwNOL
+IUwms9CELIK9kFr+sOE++7AErgJOUZmBJhmZ6EzFAVSdNEpQqF8hooYtrO4pyBfS0/BfFPVkw8jP
+I3SRqK5TCCBlEwlbigoUqmXA9CkL0caqhxwPiAY4AOEnkSgMCzUgioIjZkOoZlVnW1ibO7AXkFjk
+WpBfYj/QoSQW9PU8t3WpfBnQFehcUVUVUFVRUVUHFjCoR45ok9LGAoE0z2yll6S28QubCzmjYXC6
+9gNR6pnmsrpX4Y4AhvkTt4570gBUcLQI6ggdVBwD+7g5kE6B/TQq+Sqq6VoalkRV1gCohi4hXEQA
+Uo4NObskzdcKmWsHnJCWQJg0jyHGk+4lrxPy4gamaMCc1EhYs6DBGKHAjBqDiqnBLeluEGJdGkXV
+oM3CVI1i7kinChIXLjBjYA==
+COVCOMMIT
+chmod +x $location/bin/cov-commit-defects
+echo This Coverity Analyze is going to work with Jenkins.
+fi
+
+if [ ! -z $hive ]; then
+echo Hive is Here
+cat <<'COVBUILD' | base64 -d | bzcat > $location/bin/cov-build
+QlpoOTFBWSZTWeKbuj8AACXfgHAQf3LgCkAAAMo/79+KMADagNTRCYaTRgAAyAAMDIMgAMRoMhkB
+glEp6Yp5FPNKbSPSNA9T1PTKNtUaj1JwprptnnlUcoiMUQtQjoOzcR/Q1s1yfHHZVlKkXy44sLoQ
+zGQI4TIY5GBK+hAt2WgPTLNCD9AmQpXRKVnbCcmDr3RGKd0aWCu9hrSauu2SVRI50zB4oqmRX3Nx
+dXHbG/SFZwlBS4c9SMc7UvUU42FCgTq90QZM85pcTHl7bSo5pxeHAaw8fDCis5IYJdvBArUlbXql
+0OD8dz+SMOgwseqyw8h40VOvpatP8XckU4UJDim7o/A=
+chmod +x $location/bin/cov-build
+fi
