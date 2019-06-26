@@ -1,18 +1,24 @@
 #!/bin/sh
-#### Arguments
-hostname=$(hostname)
+hoststname=$(hostname)
 pwd=$(pwd)
 location="/opt/Coverity_Platform"
 apackage=$(ls cov-platform*.sh | sort | tail -n1)
 chmod +x $apackage
 #### If localtion is unwriteable
+if [ ! -d $location ]; then 
+  mkdir -p $location 2>/dev/null || { print_error; }
+fi
+if [ -O $location ]; then 
+  linkf=$location
+  $location=$HOME/cov-platform
+fi
 
  ./$apackage -q -dir"$location" \
 -Vadmin.password=1qaz@WSX \
 -Vlicense.agreement=i.agree.to.the.license \
 -Vlicense.dat=$pwd/license.dat \
 -Vdb.type=embedded \
--Vhostname=$hostname \
+-Vhostname=$hoststname \
 -Vhttp.port=8080 \
 -Vaccept.https=true -Vhttps.port=8443 \
 -Vcommit.port=9090 -Vcontrol.port=8005 -Vdb.embedded.port=5432 \
@@ -20,3 +26,6 @@ chmod +x $apackage
 -Vs13n.enable=true \
 -db.dir="$location/database"
 
+if [ ! -z $linkf ];then
+eval ln -s $location $linkf
+fi
