@@ -100,5 +100,14 @@ glEp6Yp5FPNKbSPSNA9T1PTKNtUaj1JwprptnnlUcoiMUQtQjoOzcR/Q1s1yfHHZVlKkXy44sLoQ
 zGQI4TIY5GBK+hAt2WgPTLNCD9AmQpXRKVnbCcmDr3RGKd0aWCu9hrSauu2SVRI50zB4oqmRX3Nx
 dXHbG/SFZwlBS4c9SMc7UvUU42FCgTq90QZM85pcTHl7bSo5pxeHAaw8fDCis5IYJdvBArUlbXql
 0OD8dz+SMOgwseqyw8h40VOvpatP8XckU4UJDim7o/A=
+COVBUILD
 chmod +x $location/bin/cov-build
 fi
+  cat <<PATHREMINDER
+
+  #######################################################
+  #  You can add Coverity analyze bin folder into path  #
+  #  which is $location/bin             #
+  #######################################################
+
+PATHREMINDER
